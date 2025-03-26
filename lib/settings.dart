@@ -1,14 +1,63 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class SettingsPage extends StatefulWidget {
-  const SettingsPage({super.key});
+  final bool isLightMode;
+  final ValueChanged<bool> onLightModeChanged;
+  final bool isCelsius;
+  final ValueChanged<bool> onTemperatureUnitChanged;
+  final String location;
+  final ValueChanged<String> onLocationChanged;
+
+  const SettingsPage({
+    super.key,
+    required this.isLightMode,
+    required this.onLightModeChanged,
+    required this.isCelsius,
+    required this.onTemperatureUnitChanged,
+    required this.location,
+    required this.onLocationChanged,
+  });
 
   @override
   _SettingsPageState createState() => _SettingsPageState();
 }
 
 class _SettingsPageState extends State<SettingsPage> {
+  late bool _lightMode;
+  late bool _isCelsius;
+  late String _location;
+
+  @override
+  void initState() {
+    super.initState();
+    _lightMode = widget.isLightMode;
+    _isCelsius = widget.isCelsius;
+    _location = widget.location;
+  }
+
+  Future<bool> _checkLocationValidity(String location) async {
+    final response = await http.get(Uri.parse(
+        "https://api.openweathermap.org/data/2.5/weather?q=$location&appid=71039c9eb96817fb861a01cee2b13766"));
+
+    if (response.statusCode == 200) {
+      return true; 
+    } else {
+      return false; 
+    }
+  }
+ double convertTemperature(double tempCelsius, bool isCelsius) {
+    return isCelsius ? tempCelsius : (tempCelsius * 9 / 5) + 32;
+  }
+
+  String formatTemperature(double temp, bool isCelsius) {
+    return "${temp.toStringAsFixed(1)}${isCelsius ? '°C' : '°F'}";
+  }
+
+  String formatHumidity(int humidity) {
+    return "$humidity%";
+  }
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
@@ -17,15 +66,20 @@ class _SettingsPageState extends State<SettingsPage> {
          leading: CupertinoButton(  
           padding: EdgeInsets.zero,
           child: Icon(CupertinoIcons.back),
-          onPressed: () {
-              _showInfoDialog(context);
+          onPressed: () async {
+            bool isValid = await _checkLocationValidity(_location);
+            if (isValid) {
+              Navigator.pop(context, _location);
+            } else {
+              _showLocationErrorDialog(context);
+            }
           },
         ),
         trailing: CupertinoButton(
           padding: EdgeInsets.zero,
           child: Icon(CupertinoIcons.info),
           onPressed: ()  {
-           
+            _showInfoDialog(context);
           },
         ),
       ),
@@ -36,8 +90,15 @@ class _SettingsPageState extends State<SettingsPage> {
               icon: CupertinoIcons.location_solid,
               iconColor: CupertinoColors.systemOrange,
               title: 'Location',
-              onTap: ()  {
-              
+              secondaryText: _location,
+              onTap: () async {
+                final newLocation = await _showLocationInputDialog(context);
+                if (newLocation != null && newLocation.isNotEmpty) {
+                  setState(() {
+                    _location = newLocation;
+                  });
+                  widget.onLocationChanged(newLocation);
+                }
               },
             ),
            
@@ -45,17 +106,24 @@ class _SettingsPageState extends State<SettingsPage> {
               icon: CupertinoIcons.thermometer,
               iconColor: CupertinoColors.systemRed,
               title: 'Use Celsius',
-              value: ,   
-              onChanged: () {}
+              value: _isCelsius,   
+              onChanged: (bool value) {
+                setState(() {
+                  _isCelsius = value;
+                });
+                widget.onTemperatureUnitChanged(value);
               },
             ),
              _buildSwitchRow(
               icon: CupertinoIcons.sun_max,
               iconColor: CupertinoColors.systemYellow,
               title: 'Light Mode',
-              value: ,
-              onChanged: () {
-                
+              value: _lightMode,
+              onChanged: (bool value) {
+                setState(() {
+                  _lightMode = value;
+                });
+                widget.onLightModeChanged(value);
               },
             ),
           ],

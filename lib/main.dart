@@ -165,7 +165,27 @@ Future<void> getData() async {
                            CupertinoButton(
                               padding: EdgeInsets.zero,
                               child: Icon(CupertinoIcons.settings, color: Colors.white, size: 30),
-                              onPressed: () {
+                              onPressed: () async {
+                                final newLocation = await Navigator.push(
+                                  context,
+                                  CupertinoPageRoute(
+                                    builder: (context) => SettingsPage(
+                                      isLightMode: isLightMode,
+                                      onLightModeChanged: toggleLightMode,
+                                      isCelsius: isCelsius,
+                                      onTemperatureUnitChanged: toggleTemperatureUnit,
+                                      location: _location,
+                                      onLocationChanged: (String location) {
+                                      },
+                                    ),
+                                  ),
+                                );
+                                if (newLocation != null && newLocation != _location) { 
+                                  setState(() {
+                                    _location = newLocation;
+                                    getData();
+                                  });
+                                }
                               },
                             ),
                           ],
