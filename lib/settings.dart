@@ -71,34 +71,38 @@ class _SettingsPageState extends State<SettingsPage> {
       child: SafeArea(
         child: ListView(
           children: <Widget>[
-            CupertinoListTile(
-              leading: 
-              Container(
-                padding: EdgeInsets.all(2),
-                decoration: BoxDecoration(
-                  color: CupertinoColors.systemOrange,
-                  borderRadius: BorderRadius.circular(8),
+            Padding(
+              padding: const EdgeInsets.only(top: 15),
+              child: CupertinoListTile(
+                leading: 
+                Container(
+                  padding: EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    color: CupertinoColors.systemOrange,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(CupertinoIcons.location_solid, color: Colors.white,),
                 ),
-                child: Icon(CupertinoIcons.location_solid, color: Colors.white,),
+                title: Text('Location'),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(_location, style: TextStyle(color: CupertinoColors.secondaryLabel.resolveFrom(context))),
+                    Icon(CupertinoIcons.forward, color: CupertinoColors.secondaryLabel.resolveFrom(context)),
+                  ],
+                ),
+                onTap: () async {
+                  final newLocation = await _showLocationInputDialog(context);
+                  if (newLocation != null && newLocation.isNotEmpty) {
+                    setState(() {
+                      _location = newLocation;
+                    });
+                    widget.onLocationChanged(newLocation);
+                  }
+                },
               ),
-              title: Text('Location'),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(_location, style: TextStyle(color: CupertinoColors.secondaryLabel.resolveFrom(context))),
-                  Icon(CupertinoIcons.forward, color: CupertinoColors.secondaryLabel.resolveFrom(context)),
-                ],
-              ),
-              onTap: () async {
-                final newLocation = await _showLocationInputDialog(context);
-                if (newLocation != null && newLocation.isNotEmpty) {
-                  setState(() {
-                    _location = newLocation;
-                  });
-                  widget.onLocationChanged(newLocation);
-                }
-              },
             ),
+            SizedBox(height: 10), 
             CupertinoListTile(
               leading: Container(
                 padding: EdgeInsets.all(2),
@@ -119,6 +123,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 },
               ),
             ),
+            SizedBox(height: 10), 
             CupertinoListTile(
               leading: Container(
                 padding: EdgeInsets.all(2),
@@ -139,6 +144,8 @@ class _SettingsPageState extends State<SettingsPage> {
                 },
               ),
             ),
+            SizedBox(height: 10), 
+
             CupertinoListTile(
               leading: Container(
                 padding: EdgeInsets.all(2),

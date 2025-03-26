@@ -177,120 +177,125 @@ Widget build(BuildContext context) {
                     ),
                     Padding(
                       padding: EdgeInsets.all(containerPadding * 0.5),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              CupertinoButton(
-                                padding: EdgeInsets.zero,
-                                child: Icon(
-                                  CupertinoIcons.settings,
-                                  color: Colors.white,
-                                  size: 30,
-                                ),
-                                onPressed: () async {
-                                  final newLocation = await Navigator.push(
-                                    context,
-                                    CupertinoPageRoute(
-                                      builder: (context) => SettingsPage(
-                                        isLightMode: isLightMode,
-                                        onLightModeChanged: toggleLightMode,
-                                        isCelsius: isCelsius,
-                                        onTemperatureUnitChanged: toggleTemperatureUnit,
-                                        location: _location,
-                                        onLocationChanged: (String location) {},
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                CupertinoButton(
+                                  padding: EdgeInsets.zero,
+                                  child: Icon(
+                                    CupertinoIcons.settings,
+                                    color: Colors.white,
+                                    size: 30,
+                                  ),
+                                  onPressed: () async {
+                                    final newLocation = await Navigator.push(
+                                      context,
+                                      CupertinoPageRoute(
+                                        builder: (context) => SettingsPage(
+                                          isLightMode: isLightMode,
+                                          onLightModeChanged: toggleLightMode,
+                                          isCelsius: isCelsius,
+                                          onTemperatureUnitChanged: toggleTemperatureUnit,
+                                          location: _location,
+                                          onLocationChanged: (String location) {},
+                                        ),
                                       ),
-                                    ),
-                                  );
-                                  if (newLocation != null && newLocation != _location) {
-                                    setState(() {
-                                      _location = newLocation;
-                                      getData();
-                                    });
-                                  }
-                                },
+                                    );
+                                    if (newLocation != null && newLocation != _location) {
+                                      setState(() {
+                                        _location = newLocation;
+                                        getData();
+                                      });
+                                    }
+                                  },
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: constraints.maxHeight * 0.02),
+                            Container(
+                              width: containerWidth,
+                              padding: EdgeInsets.symmetric(
+                                vertical: constraints.maxHeight * 0.05,
+                                horizontal: containerPadding,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  'Weather',
+                                  style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.w500),
+                                ),
+                                SizedBox(height: 15),
+                        
+                                // City & Date
+                                Text(city, style: TextStyle(fontSize: 34, color: Colors.white, fontWeight: FontWeight.bold)),
+                                Text(formattedDate, style: TextStyle(fontSize: 16, color: Colors.white70)),
+                        
+                                SizedBox(height: 15),
+                        
+                                // Weather Icon & Description
+                                Icon(weather, size: 90, color: Colors.white),
+                                SizedBox(height: 5),
+                                Text(description, style: TextStyle(fontSize: 18, color: Colors.white70)),
+                        
+                                SizedBox(height: 5),
+                        
+                                // Temperature
+                                Text(temperature, style: TextStyle(fontSize: 42, fontWeight: FontWeight.bold, color: Colors.white)),
+                        
+                                SizedBox(height: 30),
+                        
+                                SingleChildScrollView(
+                                  child: Column(
+                                    children: [
+                                                              
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(child: weatherDetail("Feels Like", feels)),
+                                      SizedBox(width: 55),
+                                      Expanded(child: weatherDetail("Humidity", humidity)),
+                                    ],
+                                  ),
+                                  SizedBox(height: 10),
+                                  
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(child: weatherDetail("Wind", windSpeed)),
+                                      SizedBox(width: 55),
+                                      Expanded(child: weatherDetail("Cloud Cover", cloudiness)),
+                                    ],
+                                  ),
+                                  SizedBox(height: 10),
+                                  
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(child: weatherDetail("Visibility", "$visibility km")),
+                                      SizedBox(width: 55),
+                                      Expanded(child: weatherDetail("Pressure", "$pressure hPa")),
+                                    ],
+                                  ),
+                                                              ],
+                                                            ),
+                                ),
+                              ],
+                            ),
+                        
+                        
                               ),
                             ],
                           ),
-                          SizedBox(height: constraints.maxHeight * 0.02),
-                          Container(
-                            width: containerWidth,
-                            padding: EdgeInsets.symmetric(
-                              vertical: constraints.maxHeight * 0.05,
-                              horizontal: containerPadding,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(city, style: TextStyle(fontSize: 32, color: Colors.white, fontWeight: FontWeight.bold)),
-                                  Text(formattedDate, style: TextStyle(fontSize: 18, color: Colors.white70)),
-                                  SizedBox(height: 10),
-                                  Icon(weather, size: 100, color: Colors.white),
-                                  Text(description, style: TextStyle(fontSize: 18, color: Colors.white70)),
-                                  SizedBox(height: 20),
-                                  Text(temperature, style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold, color: Colors.white)),
-                                  Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Expanded(
-                                          child: Text('H: $humidity', 
-                                            style: TextStyle(fontSize: 20, color: Colors.white70),
-                                            textAlign: TextAlign.right, 
-                                            overflow: TextOverflow.ellipsis
-                                          ),
-                                        ),
-                                        SizedBox(width: 25), 
-                                        Expanded(
-                                          child: Text('L: $feels', 
-                                            style: TextStyle(fontSize: 20, color: Colors.white70),
-                                            textAlign: TextAlign.left, 
-                                            overflow: TextOverflow.ellipsis
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                 
-                                  SizedBox(height: 65),
-                                  Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text("Wind Speed: $windSpeed", style: TextStyle(fontSize: 16, color: Colors.white70), overflow: TextOverflow.ellipsis),
-                                      SizedBox(height: 8),
-                                      // Text("Cloudiness: $cloudiness", style: TextStyle(fontSize: 16, color: Colors.white70), overflow: TextOverflow.ellipsis),
-                                      Text("Pressure: $pressure", style: TextStyle(fontSize: 16, color: Colors.white70), overflow: TextOverflow.ellipsis),
-                                    ],
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      Text("Visibility: $visibility", style: TextStyle(fontSize: 16, color: Colors.white70), overflow: TextOverflow.ellipsis),
-                                       SizedBox(height: 8),
-                                      Text("Cloudiness: $cloudiness", style: TextStyle(fontSize: 16, color: Colors.white70), overflow: TextOverflow.ellipsis),
-                                      // Text("Sunrise: $sunrise", style: TextStyle(fontSize: 16, color: Colors.white70), overflow: TextOverflow.ellipsis),
-                                      // Text("Sunset: $sunset", style: TextStyle(fontSize: 16, color: Colors.white70), overflow: TextOverflow.ellipsis),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ), 
-                            SizedBox(height: 30)
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
+                      ),
                       ),
                     ],
                   ),
@@ -302,4 +307,16 @@ Widget build(BuildContext context) {
       ),
     );
   }
+}
+
+// Helper function to create weather detail tiles
+Widget weatherDetail(String title, String value) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(title, style: TextStyle(fontSize: 14, color: Colors.white70)),
+      SizedBox(height: 3),
+      Text(value, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+    ],
+  );
 }
