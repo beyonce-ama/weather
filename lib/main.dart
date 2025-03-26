@@ -151,7 +151,6 @@ Future<void> getData() async {
                     ),
                   ),
                   Container(
-                    color: Colors.black.withOpacity(0.2),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(20.0),
@@ -162,6 +161,7 @@ Future<void> getData() async {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             SizedBox(width: 100),
+                            SizedBox(height: 80),
                            CupertinoButton(
                               padding: EdgeInsets.zero,
                               child: Icon(CupertinoIcons.settings, color: Colors.white, size: 30),
@@ -190,7 +190,7 @@ Future<void> getData() async {
                             ),
                           ],
                         ),
-                        SizedBox(height: 50),
+                        SizedBox(height: 10),
                         Container(
                           padding: EdgeInsets.fromLTRB(95, 35, 95, 80),
                           decoration: BoxDecoration(

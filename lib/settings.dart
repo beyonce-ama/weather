@@ -40,30 +40,15 @@ class _SettingsPageState extends State<SettingsPage> {
   Future<bool> _checkLocationValidity(String location) async {
     final response = await http.get(Uri.parse(
         "https://api.openweathermap.org/data/2.5/weather?q=$location&appid=71039c9eb96817fb861a01cee2b13766"));
-
-    if (response.statusCode == 200) {
-      return true; 
-    } else {
-      return false; 
-    }
-  }
- double convertTemperature(double tempCelsius, bool isCelsius) {
-    return isCelsius ? tempCelsius : (tempCelsius * 9 / 5) + 32;
+    return response.statusCode == 200;
   }
 
-  String formatTemperature(double temp, bool isCelsius) {
-    return "${temp.toStringAsFixed(1)}${isCelsius ? '°C' : '°F'}";
-  }
-
-  String formatHumidity(int humidity) {
-    return "$humidity%";
-  }
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         middle: Text('Settings'),
-         leading: CupertinoButton(  
+        leading: CupertinoButton(
           padding: EdgeInsets.zero,
           child: Icon(CupertinoIcons.back),
           onPressed: () async {
@@ -78,7 +63,7 @@ class _SettingsPageState extends State<SettingsPage> {
         trailing: CupertinoButton(
           padding: EdgeInsets.zero,
           child: Icon(CupertinoIcons.info),
-          onPressed: ()  {
+          onPressed: () {
             _showInfoDialog(context);
           },
         ),
@@ -86,11 +71,24 @@ class _SettingsPageState extends State<SettingsPage> {
       child: SafeArea(
         child: ListView(
           children: <Widget>[
-            _buildSettingsRow(
-              icon: CupertinoIcons.location_solid,
-              iconColor: CupertinoColors.systemOrange,
-              title: 'Location',
-              secondaryText: _location,
+            CupertinoListTile(
+              leading: 
+              Container(
+                padding: EdgeInsets.all(2),
+                decoration: BoxDecoration(
+                  color: CupertinoColors.systemOrange,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(CupertinoIcons.location_solid, color: Colors.white,),
+              ),
+              title: Text('Location'),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(_location, style: TextStyle(color: CupertinoColors.secondaryLabel.resolveFrom(context))),
+                  Icon(CupertinoIcons.forward, color: CupertinoColors.secondaryLabel.resolveFrom(context)),
+                ],
+              ),
               onTap: () async {
                 final newLocation = await _showLocationInputDialog(context);
                 if (newLocation != null && newLocation.isNotEmpty) {
@@ -101,30 +99,64 @@ class _SettingsPageState extends State<SettingsPage> {
                 }
               },
             ),
-           
-            _buildSwitchRow(
-              icon: CupertinoIcons.thermometer,
-              iconColor: CupertinoColors.systemRed,
-              title: 'Use Celsius',
-              value: _isCelsius,   
-              onChanged: (bool value) {
-                setState(() {
-                  _isCelsius = value;
-                });
-                widget.onTemperatureUnitChanged(value);
-              },
+            CupertinoListTile(
+              leading: Container(
+                padding: EdgeInsets.all(2),
+                decoration: BoxDecoration(
+                  color: CupertinoColors.systemRed,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(CupertinoIcons.thermometer, color: Colors.white,),
+              ),
+              title: Text('Use Celsius'),
+              trailing: CupertinoSwitch(
+                value: _isCelsius,
+                onChanged: (bool value) {
+                  setState(() {
+                    _isCelsius = value;
+                  });
+                  widget.onTemperatureUnitChanged(value);
+                },
+              ),
             ),
-             _buildSwitchRow(
-              icon: CupertinoIcons.sun_max,
-              iconColor: CupertinoColors.systemYellow,
-              title: 'Light Mode',
-              value: _lightMode,
-              onChanged: (bool value) {
-                setState(() {
-                  _lightMode = value;
-                });
-                widget.onLightModeChanged(value);
-              },
+            CupertinoListTile(
+              leading: Container(
+                padding: EdgeInsets.all(2),
+                decoration: BoxDecoration(
+                  color: CupertinoColors.systemYellow,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(CupertinoIcons.sun_max, color: Colors.white,),
+              ),
+              title: Text('Light Mode'),
+              trailing: CupertinoSwitch(
+                value: _lightMode,
+                onChanged: (bool value) {
+                  setState(() {
+                    _lightMode = value;
+                  });
+                  widget.onLightModeChanged(value);
+                },
+              ),
+            ),
+            CupertinoListTile(
+              leading: Container(
+                padding: EdgeInsets.all(2),
+                decoration: BoxDecoration(
+                  color: CupertinoColors.activeBlue,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(CupertinoIcons.info, color: Colors.white,),
+              ),
+              title: Text('About'),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('Version: 1.0', style: TextStyle(color: CupertinoColors.secondaryLabel.resolveFrom(context))),
+                  Icon(CupertinoIcons.forward, color: CupertinoColors.secondaryLabel.resolveFrom(context)),
+                ],
+              ),
+              onTap: () {},
             ),
           ],
         ),
@@ -143,14 +175,8 @@ class _SettingsPageState extends State<SettingsPage> {
           placeholder: 'City name',
         ),
         actions: <Widget>[
-          CupertinoDialogAction(
-            child: Text('Cancel'),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          CupertinoDialogAction(
-            child: Text('Save'),
-            onPressed: () => Navigator.of(context).pop(locationController.text),
-          ),
+          CupertinoDialogAction(child: Text('Cancel'), onPressed: () => Navigator.of(context).pop()),
+          CupertinoDialogAction(child: Text('Save'), onPressed: () => Navigator.of(context).pop(locationController.text)),
         ],
       ),
     );
@@ -163,55 +189,9 @@ class _SettingsPageState extends State<SettingsPage> {
         title: Text('Invalid Location'),
         content: Text('The entered location was not found.'),
         actions: <Widget>[
-          CupertinoDialogAction(
-            child: Text('OK'),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
+          CupertinoDialogAction(child: Text('OK'), onPressed: () => Navigator.of(context).pop()),
         ],
       ),
-    );
-  }
-
-  Widget _buildSwitchRow({
-    required IconData icon,
-    required Color iconColor,
-    required String title,
-    required bool value,
-    required ValueChanged<bool> onChanged,
-  }) {
-    return CupertinoListTile(
-      leading: Icon(icon, color: iconColor),
-      title: Text(title),
-      trailing: CupertinoSwitch(
-        value: value,
-        onChanged: onChanged,
-        activeTrackColor: CupertinoColors.activeGreen,
-      ),
-    );
-  }
-
-  Widget _buildSettingsRow({
-    required IconData icon,
-    required Color iconColor,
-    required String title,
-    String? secondaryText,
-    VoidCallback? onTap,
-  }) {
-    return CupertinoListTile(
-      leading: Icon(icon, color: iconColor),
-      title: Text(title),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          if (secondaryText != null)
-            Text(
-              secondaryText,
-              style: TextStyle(color: CupertinoColors.secondaryLabel.resolveFrom(context)),
-            ),
-          Icon(CupertinoIcons.forward, color: CupertinoColors.secondaryLabel.resolveFrom(context)),
-        ],
-      ),
-      onTap: onTap,
     );
   }
 }
