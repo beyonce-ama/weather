@@ -46,6 +46,12 @@ class _MyAppState extends State<MyApp> {
   String humidity = "----";
   String feels = "----";
   String description = '';
+   String windSpeed = "----";
+  String cloudiness = "----";
+  String pressure = "----";
+  String visibility = "----";
+  String sunrise = "----";
+  String sunset = "----";
   String backgroundAsset = 'images/bg.jpg'; 
 
   String formattedDate = DateFormat('dd MMMM yyyy').format(DateTime.now());
@@ -70,7 +76,16 @@ Future<void> getData() async {
         feels = "${((feelsLikeCelsius * 9 / 5) + 32).toStringAsFixed(1)}°F";
       }
 
-      humidity = "${weatherData["main"]["humidity"]}%";
+      humidity = "${weatherData["main"]["humidity"]}%"; 
+      windSpeed = "${weatherData["wind"]["speed"]} m/s";
+        cloudiness = "${weatherData["clouds"]["all"]}%";
+        pressure = "${weatherData["main"]["pressure"]} hPa";
+        visibility = "${(weatherData["visibility"] / 1000).toStringAsFixed(1)} km";
+
+        DateTime sunriseTime = DateTime.fromMillisecondsSinceEpoch(weatherData["sys"]["sunrise"] * 1000);
+        DateTime sunsetTime = DateTime.fromMillisecondsSinceEpoch(weatherData["sys"]["sunset"] * 1000);
+        sunrise = DateFormat('hh:mm a').format(sunriseTime);
+        sunset = DateFormat('hh:mm a').format(sunsetTime);
 
          switch (weatherData["weather"][0]["main"]) {
           case "Clouds":
@@ -131,122 +146,157 @@ Future<void> getData() async {
     super.initState();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return CupertinoApp(
-      theme: CupertinoThemeData(brightness: isLightMode ? Brightness.light : Brightness.dark),
-      debugShowCheckedModeBanner: false,
-      home: Navigator(
-        onGenerateRoute: (settings) {
-          return CupertinoPageRoute(
-            builder: (context) => CupertinoPageScaffold(
-              child: Stack(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: AssetImage(backgroundAsset),
-                        fit: BoxFit.cover,
+@override
+Widget build(BuildContext context) {
+  return CupertinoApp(
+    theme: CupertinoThemeData(
+      brightness: isLightMode ? Brightness.light : Brightness.dark,
+    ),
+    debugShowCheckedModeBanner: false,
+    home: LayoutBuilder(
+      builder: (context, constraints) {
+        double containerWidth = constraints.maxWidth * 0.8;
+        double containerPadding = constraints.maxWidth * 0.1;
+        
+        return Navigator(
+          onGenerateRoute: (settings) {
+            return CupertinoPageRoute(
+              builder: (context) => CupertinoPageScaffold(
+                child: Stack(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: AssetImage(backgroundAsset),
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     ),
-                  ),
-                  Container(
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            SizedBox(width: 100),
-                            SizedBox(height: 80),
-                           CupertinoButton(
-                              padding: EdgeInsets.zero,
-                              child: Icon(CupertinoIcons.settings, color: Colors.white, size: 30),
-                              onPressed: () async {
-                                final newLocation = await Navigator.push(
-                                  context,
-                                  CupertinoPageRoute(
-                                    builder: (context) => SettingsPage(
-                                      isLightMode: isLightMode,
-                                      onLightModeChanged: toggleLightMode,
-                                      isCelsius: isCelsius,
-                                      onTemperatureUnitChanged: toggleTemperatureUnit,
-                                      location: _location,
-                                      onLocationChanged: (String location) {
-                                      },
-                                    ),
-                                  ),
-                                );
-                                if (newLocation != null && newLocation != _location) { 
-                                  setState(() {
-                                    _location = newLocation;
-                                    getData();
-                                  });
-                                }
-                              },
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 10),
-                        Container(
-                          padding: EdgeInsets.fromLTRB(95, 35, 95, 80),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Column(
+                    Container(
+                      color: Colors.black.withOpacity(0.2),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(containerPadding * 0.5),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              Text(
-                                'Current',
-                                style: TextStyle(fontSize: 18, color: Colors.white),
-                              ),
-                              Text(
-                                'WEATHER',
-                                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
-                              ),
-                              SizedBox(height: 35),
-                              Text(
-                                city,
-                                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white),
-                              ),
-                              SizedBox(height: 5),
-                              Text(
-                                formattedDate,
-                                style: TextStyle(fontSize: 18, color: Colors.white70),
-                              ),
-                              SizedBox(height: 16),
-                              Icon(
-                                weather,
-                                size: 100,
-                                color: Colors.white,
-                              ),
-                              Text(
-                                description,
-                                style: TextStyle(fontSize: 18, color: Colors.white70),
-                              ),
-                              SizedBox(height: 40),
-                              Text(
-                                temperature,
-                                style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold, color: Colors.white),
-                              ),
-                              SizedBox(height: 5),
-                              Text(
-                                'H: $humidity  L: $feels',
-                                style: TextStyle(fontSize: 20, color: Colors.white70),
+                              CupertinoButton(
+                                padding: EdgeInsets.zero,
+                                child: Icon(
+                                  CupertinoIcons.settings,
+                                  color: Colors.white,
+                                  size: 30,
+                                ),
+                                onPressed: () async {
+                                  final newLocation = await Navigator.push(
+                                    context,
+                                    CupertinoPageRoute(
+                                      builder: (context) => SettingsPage(
+                                        isLightMode: isLightMode,
+                                        onLightModeChanged: toggleLightMode,
+                                        isCelsius: isCelsius,
+                                        onTemperatureUnitChanged: toggleTemperatureUnit,
+                                        location: _location,
+                                        onLocationChanged: (String location) {},
+                                      ),
+                                    ),
+                                  );
+                                  if (newLocation != null && newLocation != _location) {
+                                    setState(() {
+                                      _location = newLocation;
+                                      getData();
+                                    });
+                                  }
+                                },
                               ),
                             ],
                           ),
+                          SizedBox(height: constraints.maxHeight * 0.02),
+                          Container(
+                            width: containerWidth,
+                            padding: EdgeInsets.symmetric(
+                              vertical: constraints.maxHeight * 0.05,
+                              horizontal: containerPadding,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(city, style: TextStyle(fontSize: 32, color: Colors.white, fontWeight: FontWeight.bold)),
+                                  Text(formattedDate, style: TextStyle(fontSize: 18, color: Colors.white70)),
+                                  SizedBox(height: 10),
+                                  Icon(weather, size: 100, color: Colors.white),
+                                  Text(description, style: TextStyle(fontSize: 18, color: Colors.white70)),
+                                  SizedBox(height: 20),
+                                  Text(temperature, style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold, color: Colors.white)),
+                                  Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Expanded(
+                                          child: Text('H: $humidity', 
+                                            style: TextStyle(fontSize: 20, color: Colors.white70),
+                                            textAlign: TextAlign.right, 
+                                            overflow: TextOverflow.ellipsis
+                                          ),
+                                        ),
+                                        SizedBox(width: 25), 
+                                        Expanded(
+                                          child: Text('L: $feels', 
+                                            style: TextStyle(fontSize: 20, color: Colors.white70),
+                                            textAlign: TextAlign.left, 
+                                            overflow: TextOverflow.ellipsis
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                 
+                                  SizedBox(height: 65),
+                                  Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text("Wind Speed: $windSpeed", style: TextStyle(fontSize: 16, color: Colors.white70), overflow: TextOverflow.ellipsis),
+                                      SizedBox(height: 8),
+                                      // Text("Cloudiness: $cloudiness", style: TextStyle(fontSize: 16, color: Colors.white70), overflow: TextOverflow.ellipsis),
+                                      Text("Pressure: $pressure", style: TextStyle(fontSize: 16, color: Colors.white70), overflow: TextOverflow.ellipsis),
+                                    ],
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Text("Visibility: $visibility", style: TextStyle(fontSize: 16, color: Colors.white70), overflow: TextOverflow.ellipsis),
+                                       SizedBox(height: 8),
+                                      Text("Cloudiness: $cloudiness", style: TextStyle(fontSize: 16, color: Colors.white70), overflow: TextOverflow.ellipsis),
+                                      // Text("Sunrise: $sunrise", style: TextStyle(fontSize: 16, color: Colors.white70), overflow: TextOverflow.ellipsis),
+                                      // Text("Sunset: $sunset", style: TextStyle(fontSize: 16, color: Colors.white70), overflow: TextOverflow.ellipsis),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ), 
+                            SizedBox(height: 30)
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
-                        Spacer(),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ),
+                ),
+              );
+            },
           );
         },
       ),
