@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'dart:convert';
 void main() => runApp(MyApp());
 
 class MyApp extends StatefulWidget {
@@ -112,9 +113,10 @@ Future<void> getData() async {
     super.initState();
   }
 
-  @override
+   @override
   Widget build(BuildContext context) {
     return CupertinoApp(
+      theme: CupertinoThemeData(brightness: isLightMode ? Brightness.light : Brightness.dark),
       debugShowCheckedModeBanner: false,
       home: Navigator(
         onGenerateRoute: (settings) {
@@ -125,7 +127,7 @@ Future<void> getData() async {
                   Container(
                     decoration: BoxDecoration(
                       image: DecorationImage(
-                        image: AssetImage('images/bg.jpg'),
+                        image: AssetImage(backgroundAsset),
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -145,8 +147,7 @@ Future<void> getData() async {
                            CupertinoButton(
                               padding: EdgeInsets.zero,
                               child: Icon(CupertinoIcons.settings, color: Colors.white, size: 30),
-                              onPressed: ()  {
-                               
+                              onPressed: () {
                               },
                             ),
                           ],
@@ -162,22 +163,27 @@ Future<void> getData() async {
                             children: [
                               Text(
                                 'Current',
+                                style: TextStyle(fontSize: 18, color: Colors.white),
                               ),
                               Text(
                                 'WEATHER',
+                                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
                               ),
                               SizedBox(height: 35),
                               Text(
                                 city,
+                                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white),
                               ),
                               SizedBox(height: 5),
                               Text(
                                 formattedDate,
+                                style: TextStyle(fontSize: 18, color: Colors.white70),
                               ),
                               SizedBox(height: 16),
                               Icon(
                                 weather,
                                 size: 100,
+                                color: Colors.white,
                               ),
                               Text(
                                 description,
@@ -186,10 +192,12 @@ Future<void> getData() async {
                               SizedBox(height: 40),
                               Text(
                                 temperature,
+                                style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold, color: Colors.white),
                               ),
                               SizedBox(height: 5),
                               Text(
                                 'H: $humidity  L: $feels',
+                                style: TextStyle(fontSize: 20, color: Colors.white70),
                               ),
                             ],
                           ),
