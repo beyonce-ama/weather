@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'dart:convert';
+import 'settings.dart';
+
 void main() => runApp(MyApp());
 
 class MyApp extends StatefulWidget {
@@ -13,7 +15,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-   bool isLightMode = false;
+  bool isLightMode = false;
   bool isCelsius = true;
   String _location = "Santa Ana";
 
@@ -73,27 +75,43 @@ Future<void> getData() async {
          switch (weatherData["weather"][0]["main"]) {
           case "Clouds":
             weather = CupertinoIcons.cloud;
+            backgroundAsset = 'images/bg.jpg';
+             description = "Cloudy";
             break;
           case "Clear":
             weather = CupertinoIcons.sun_max;
+            backgroundAsset = 'images/clear.jpg';
+             description = "Clear Sky";
             break;
           case "Mist":
             weather = CupertinoIcons.cloud_rain;
+            backgroundAsset = 'images/mist.jpg';
+             description = "Misty";
             break;
           case "Rain":
             weather = CupertinoIcons.cloud_bolt_rain;
+            backgroundAsset = 'images/rain.jpg';
+             description = "Rainy";
             break;
           case "Snow":
             weather = CupertinoIcons.snow;
+            backgroundAsset = 'images/snow.jpg';
+             description = "Snowy";
             break;
           case "Thunderstorm":
             weather = CupertinoIcons.cloud_bolt;
+            backgroundAsset = 'images/thunderstorm.jpg';
+             description = "Thunderstorms";
             break;
           case "Drizzle":
             weather = CupertinoIcons.cloud_drizzle;
+            backgroundAsset = 'images/drizzle.jpg';
+             description = "Drizzle";
             break;
           default:
             weather = CupertinoIcons.cloud;
+            backgroundAsset = 'images/bg.jpg'; 
+             description = "Cloudy";
             break;
          }
     } else {
@@ -113,7 +131,7 @@ Future<void> getData() async {
     super.initState();
   }
 
-   @override
+  @override
   Widget build(BuildContext context) {
     return CupertinoApp(
       theme: CupertinoThemeData(brightness: isLightMode ? Brightness.light : Brightness.dark),
