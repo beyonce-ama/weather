@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
+import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends StatefulWidget {
@@ -11,6 +12,106 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+   bool isLightMode = false;
+  bool isCelsius = true;
+  String _location = "Santa Ana";
+
+  void toggleLightMode(bool value) {
+    setState(() {
+      isLightMode = value;
+    });
+  }
+
+  void toggleTemperatureUnit(bool value) {
+    setState(() {
+      isCelsius = value;
+      getData();
+    });
+  }
+
+  void updateLocation(String newLocation) {
+    setState(() {
+      _location = newLocation;
+      getData();
+    });
+  }
+
+  Map<String, dynamic> weatherData = {};
+  // String url = "https://api.openweathermap.org/data/2.5/weather?q=arayat&appid=71039c9eb96817fb861a01cee2b13766";
+  String city = "Loading...";
+  String temperature = "----";
+  String humidity = "----";
+  String feels = "----";
+  String description = '';
+  String backgroundAsset = 'images/bg.jpg'; 
+
+  String formattedDate = DateFormat('dd MMMM yyyy').format(DateTime.now());
+  IconData? weather;
+Future<void> getData() async {
+  final response = await http.get(Uri.parse(
+      "https://api.openweathermap.org/data/2.5/weather?q=$_location&appid=71039c9eb96817fb861a01cee2b13766"));
+
+  setState(() {
+    if (response.statusCode == 200) {
+      weatherData = jsonDecode(response.body);
+      city = weatherData["name"];
+
+      double tempInCelsius = weatherData["main"]["temp"] - 273.15;
+      double feelsLikeCelsius = weatherData["main"]["feels_like"] - 273.15;
+
+      if (isCelsius) {
+        temperature = "${tempInCelsius.toStringAsFixed(1)}°C";
+        feels = "${feelsLikeCelsius.toStringAsFixed(1)}°C";
+      } else {
+        temperature = "${((tempInCelsius * 9 / 5) + 32).toStringAsFixed(1)}°F";
+        feels = "${((feelsLikeCelsius * 9 / 5) + 32).toStringAsFixed(1)}°F";
+      }
+
+      humidity = "${weatherData["main"]["humidity"]}%";
+
+         switch (weatherData["weather"][0]["main"]) {
+          case "Clouds":
+            weather = CupertinoIcons.cloud;
+            break;
+          case "Clear":
+            weather = CupertinoIcons.sun_max;
+            break;
+          case "Mist":
+            weather = CupertinoIcons.cloud_rain;
+            break;
+          case "Rain":
+            weather = CupertinoIcons.cloud_bolt_rain;
+            break;
+          case "Snow":
+            weather = CupertinoIcons.snow;
+            break;
+          case "Thunderstorm":
+            weather = CupertinoIcons.cloud_bolt;
+            break;
+          case "Drizzle":
+            weather = CupertinoIcons.cloud_drizzle;
+            break;
+          default:
+            weather = CupertinoIcons.cloud;
+            break;
+         }
+    } else {
+       backgroundAsset = 'images/bg.jpg';
+      city = "Location not found";
+      temperature = "----";
+      humidity = "----";
+      feels = "----";
+      description = "";
+      weather = null;
+    }
+  });
+}
+  @override
+  void initState() {
+    getData();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return CupertinoApp(
@@ -71,7 +172,7 @@ class _MyAppState extends State<MyApp> {
                               ),
                               SizedBox(height: 5),
                               Text(
-                                date,
+                                formattedDate,
                               ),
                               SizedBox(height: 16),
                               Icon(
