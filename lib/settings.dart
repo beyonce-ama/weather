@@ -18,7 +18,7 @@ class _SettingsPageState extends State<SettingsPage> {
           padding: EdgeInsets.zero,
           child: Icon(CupertinoIcons.back),
           onPressed: () {
-           
+              _showInfoDialog(context);
           },
         ),
         trailing: CupertinoButton(
@@ -147,3 +147,74 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 }
+
+void _showInfoDialog(BuildContext context) {
+  showCupertinoDialog(
+    context: context,
+    builder: (context) => Center( 
+      child: CupertinoPopupSurface(
+        child: Container(
+          width: MediaQuery.of(context).size.width * 0.85,  
+          height: 450,
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min, 
+            children: [
+              const Text(
+                "Meet the Team", 
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      _buildMemberTile("Beyonce Ama", "images/ama.jpg", "Lead Developer"),
+                      _buildMemberTile("Jolas Arpon", "images/arpon.jpg", "Developer"),
+                      _buildMemberTile("Monica Carreon", "images/carreon.jpg", "Developer"),
+                      _buildMemberTile("Romel Gamboa", "images/gamboa.jpg", "Developer"),
+                      _buildMemberTile("Kayle Cedric Larin", "images/larin.jpg", "Developer"),
+                      _buildMemberTile("Rachelle Anne Macalino", "images/macalino.jpg", "Developer"),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              CupertinoButton(
+                child: const Text(
+                  "Close", 
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                ),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+
+  Widget _buildMemberTile(String name, String imagePath, String role) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10.0),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 35,
+            backgroundColor: Colors.indigo.shade200,
+            backgroundImage: AssetImage(imagePath),
+          ),
+          const SizedBox(width: 15),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(name, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+              Text(role, style: const TextStyle(fontSize: 14, color: CupertinoColors.systemGrey)),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
