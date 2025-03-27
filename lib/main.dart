@@ -280,9 +280,9 @@ Widget build(BuildContext context) {
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Expanded(child: weatherDetail("Visibility", "$visibility km")),
+                                      Expanded(child: weatherDetail("Visibility", visibility)),
                                       SizedBox(width: 55),
-                                      Expanded(child: weatherDetail("Pressure", "$pressure hPa")),
+                                      Expanded(child: weatherDetail("Pressure", pressure)),
                                     ],
                                   ),
                                                               ],
